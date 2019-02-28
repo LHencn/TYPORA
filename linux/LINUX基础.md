@@ -1,3 +1,7 @@
+[TOC]
+
+
+
 # LINUX基础
 
 源：应用市场
@@ -19,7 +23,7 @@
 
 1. 计算器：CPU
 2. 控制器：CPU
-3. 存储器：内部存储（内存） 寻址空间（MP3） 国家：每个国家做成一个单元，国家中的各个市为每个区
+3. ## 存储器：内部存储（内存） 寻址空间（MP3） 国家：每个国家做成一个单元，国家中的各个市为每个区
 4. 输入设备：鼠标、键盘
 5. 输出设备：显示器、音频等
 
@@ -355,23 +359,728 @@ office：word、ppt、表格等均需采用打印功能，此时可以采用系�
 
    6. `-E`：在显示内容时，结尾添加$符号
 
-6. `cp` 
+6. `cp` ：复制文件或目录（copy）
+
+   1. 语法：`cp [options] [src_file] [des_file]` 
+   2. `-f` ：force，强制复制文件或目录不进行提示
+   3. `-r`：递归复制目录
+   4. `-s`：为某个文件创建符号链接（软链接），而不是复制文件
+   5. `-b`：覆盖已有的文件前，对目标文件进行备份
+   6. `-l`：为文件创建硬链接，而不是复制文件
+   7. `-p`：复制文件时保留文件的原有
+
+
+
+# Shell
+
+1. 广义上分为两类：
+   1. GUI：包括GNOME，KDE，XFACE等
+   2. CLI：包括sh，ksh，bash等（Linux发行版本中，bash是默认使用的shell程序）
+2. shell启动：当用户登录完成后，系统会自动启动shell程序
+   1. 某一个应用程序启动之后即会调用一个进程，通过PID区分（在系统中一个进程只认为自己存在）
+   2. ？root、普通用户登录shell如何区分？
+
+Linux的基本命令：
+
+# 一.文件管理
+
+## 1.文件查找：find
+
+#### 使用方法
+
+```
+find [查找目录] [查找条件]
+
+查找目录：
+    .：在当前目录及子目录下查找（默认）
+    A：在目录A及A的子目录下查找
+查找条件：
+    -name：根据文件名查找
+    -regex：使用正则表达式匹配
+    -type：按类型查找（f:文件，d:目录，l:链接...）
+    -atime：按访问时间查找（n:n天前的一天内，+n:n天前(不含n天本身)，-n:n天内(不含n天)）
+    -mtime：按修改时间查找（n:n天前的一天内，+n:n天前(不含n天本身)，-n:n天内(不含n天)）
+    -size：按大小查找（单位k，+nk:"比nk更大"，-nk:"比nk更小"）
+    -perm：按权限查找（644：权限等于644的文件）
+    -user/-nouser：用户名等于/用户名不等于
+    -group/-nogroup：组名等于/组名不等于
+```
+
+#### 示例
+
+```
+#1.在当前目录及子目录下查找后缀为cpp的文件
+find . -name *.cpp
+
+#2.使用正则表达式查找
+find -regex ".*.cpp$"
+```
+
+## 2.文件拷贝：cp
+
+#### 使用方法
+
+```
+cp [选项] 源路径 目的路径
+
+选项：
+    -a：将所有属性一起复制（包括拥有者、时间等信息）
+    -i：目标文件存在时，进行询问
+    -r：递归复制
+```
+
+## 3.打包解包：tar
+
+#### 使用方法
+
+```
+tar [-j|-z] [cv] [-f 压缩包名] 目录
+tar [-j|-z] [xv] [-f 解压包名] [-C 解压路径]
+
+选项：
+    -c/-x：打包/解包
+    -j/-z：bzip2格式/gzip格式
+    -v：显示过程
+```
+
+# 二.文本处理
+
+## 1.(显示行号)查看文件：nl
+
+行号计算不包括空行
+
+## 2.文本查找：grep
+
+#### 使用方法
+
+```
+grep [选项] 模式串 文件
+输出 | grep [选项] 模式串
+
+选项
+    -e：使用多个模式串
+    -i：忽略大小写
+    -n：打印行号
+    -c：统计次数（一行算一次）
+```
+
+#### 示例
+
+```
+#1.在test.c中搜索包含字符串”printf“或”count“的行
+grep -e "printf" -e "count" test.c
+```
+
+## 3.排序：sort
+
+#### 使用方法
+
+```
+sort [选项] 文件
+输出 | sort [选项]
+
+选项
+    -d：按字典序排序（默认）
+    -n：按数字排序
+    -k："-k n"表示按各行第n列进行排序
+    -r：反序
+```
+
+## 4.转换：tr
+
+#### 使用方法
+
+```
+#set1、set2为字符集，可以是单个字符，也可以是字符串
+输出 | tr [选项] set1 set2
+
+选项：
+    -d：删除字符
+    -s：字符压缩
+```
+
+#### 示例
+
+```
+#1.删除字符':'
+cat /etc/passwd | tr -d ':'
+
+#2.将小写字母替换成大写字母
+last | tr '[a-z]' 'A-Z'
+
+#3.将'a'、'b'、'c'替换成'z'
+cat test | tr “abc” 'z'
+
+#4.将连续的'a'压缩成'b'（单个或连续出现的多个‘a’会压缩成一个‘b’）
+cat test | tr -s 'a' 'b'
+```
+
+## 5.切分文本：cut
+
+#### 使用方法
+
+```
+cut [选项] 文件
+输出 | cut [选项]
+
+选项：
+    -d：分隔符（-d ':' 以’:‘为分隔符）
+    -f：选择域（-f 1,2 输出分隔后第1列和第2列）
+    -c：字符范围（-c n-m 输出第n到m个字符。如果没有m，输出到末尾）
+```
+
+#### 示例
+
+```
+#1.按’:‘分隔$PATH，输出第3个和第5个
+echo $PATH | cut -d ':' -f 3,5
+
+#2.输出export运行结果每行的第12-20个字符
+export | cut -c 12-20
+```
+
+## 6.拼接文本：paste
+
+#### 使用方法
+
+```
+paste [选项] file1 file2
+
+选项：
+    -d：指定拼接时使用的分隔符（默认使用tab作为分隔符）
+```
+
+## 7.统计：wc
+
+#### 使用方法
+
+```
+wc [选项] 文件
+输出 | wc [选项]
+
+选项：
+    -c：统计字符数
+    -w：统计单词数
+    -l：统计行数
+```
+
+## 8.数据处理：sed
+
+> sed常用于一整行的处理。如果有一个100万行的文件，要在第100行加某些文字，此时由于文件太大，不适合用vim处理。因此使用sed是个很好的选择
+
+#### 使用方法
+
+```
+sed [选项] '[动作]' 文件
+输入 | sed [选项] '[动作]'
+
+选项：
+    -n：安静模式，只输出sed处理过的行（否则未处理行也会输出）
+    -i：结果直接作用到文件（没指定时不会修改文件）
+    -e：在命令行模式上输入动作
+    -f：从文件中读取动作
+
+动作：[n1[,n2]] function
+function:
+    a/i：在后插入/在前插入
+    d：删除
+    p：打印
+    s：替换
+```
+
+#### 示例
+
+```
+#1.插入
+nl /etc/passwd | sed '2a drink tea' #在第2行后插入一行："drink tea"
+nl /etc/passwd | sed '2a aaa \
+> bbb' #在第2行后插入两行："aaa"和"bbb"
+
+#2.删除
+nl /etc/passwd | sed '2,5d' #删除2~5行
+sed '/^$/d' ip #将ip文件中的空行删除
+
+#3.打印2~5行（安静模式，不使用安静模式2~5行会打印2次）
+nl /etc/passwd | sed -n '2,5p'
+
+#4.替换
+nl /etc/passwd | sed '2s/daemon/root/g' #将第二行的daemon替换成root
+ifconfig | grep 'inet addr' | sed 's/^.*addr://g' #将所有开头的“inet addr:”删除
+```
+
+## 9.数据处理：awk
+
+> 相比于sed常用于一整行的处理，awk则比较倾向于将一行分成数个“字段”来处理。因此，相当适合小型的数据处理
+
+**awk处理步骤**：
+
+1. 读入第一行，并将第一行的数据填入$0,$1,$2等变量当中
+2. 依据条件类型的限制，判断是否需要进行后面的动作
+3. 做完所有的动作与条件类型
+4. 若还有后续的“行”的数据，则重复1~3步，直到所有的数据都读完为止
+
+#### 使用方法
+
+```
+awk '条件类型1{动作1} 条件类型2{动作2} ...' filename
+输出 | awk '条件类型1{动作1} 条件类型2{动作2} ...'
+
+变量：
+    $0：整行
+    $1：按分隔符分隔后的第1列
+    $2：按分隔符分隔后的第2列
+    $k：按分隔符分隔后的第k列
+    NF：每一行拥有的字段数
+    NR：目前所处理的行数
+    FS：目前的分隔字符（默认是空格或tab）
+条件判断：>、<、>=、<=、==、!=
+命令分隔：使用';'或Enter
+```
+
+#### 示例
+
+```
+#1.打印last -n 5结果中每行经过分隔符(默认情况下为空格或tab)分隔后的第1列和第3列
+last -n 5 | awk '{print $1 "\t" $3}'
+
+#2.以':'作为分隔符，打印第3列小于10的所有行的第1列和第3列
+cat /etc/passwd | awk '{FS=":"} $3<10{print $1 "\t" $3}'      #（第一行不会处理）
+cat /etc/passwd | awk 'BEGIN{FS=":"} $3<10{print $1 "\t" $3}' #（第一行会处理）
+
+#3.假设test文件由3列数字组成，以空格分隔。该命令会计算每行的和然后打印
+awk '{total=$1+$2+$3;printf "%10d %10d %10d %10.2f\n",$1,$2,$3,total}' test
+```
+
+注意上面的示例2，awk首先是读取一行，分隔后的数据填入$0,$1,$2等变量中才开始进行条件判断和执行动作。因此第一条命令在按空格或tab分隔后才将分隔符换成':'，所以第一行显示结果不对
+
+# 三.性能分析
+
+## 1.进程查询：ps
+
+man ps手册非常庞大，不是很好查阅，因此主要记住几个命令
+
+#### 示例
+
+```
+#1.列出仅与自身环境有关的进程，最上层的父进程是允许该ps命令的bash而没有扩展到init进程中去
+ps -l
+
+#2.列出系统所有进程的信息
+ps aux
+ps -ef    #aux会截断COMMAND列，-ef不会。aux是BSD风格，-ef是System V风格
+ps axjf   #以"进程树"的方式显示所有进程
+ps -lA    #输出格式同ps -l
+```
+
+ ![img](https://github.com/ID-Q/note-1/raw/master/pic/linux-ps-1.png)
+
+**F**：进程标志，说明进程的权限
+
+- 4：root权限
+- 1：仅能fork而不能exec
+- 0：既非4也非1
+
+# socket
+
+1、**创建**：
+
+```c
+int socket(int domain, int type, int protocol);
+domain:
+	AF_INET, AF_INET6, AF_LOCAL, AF_ROUTE
+type:
+	SOCK_STREAM, SOCK_DGRAM, SOCK_PACKET, SOCK_SEQPACKET
+protocol:
+	IPPROTO_TCP, IPPTOTO_UDP, IPPROTO_STCP, IPPROTO_TIPC
+返回值：socket文件描述符
+```
+
+2、**绑定：**
+
+```c
+int bind(int sockfd, const struct sockaddr *addr, socketlen_t addrlen);
+	sockfd是调用socket返回的文件描述符
+	add是指向数据结构struct sockaddr的指针，它保存你的地址（即端口和IP地址）信息
+	addrlen设置为sizeof(struct sockaddr)
+返回值：-1为错误，并设置全局变量errno
+```
+
+3、[**全局变量errno详解：**](http://c.biancheng.net/c/errno/)
+
+4、
 
 
 
 
 
+## 线程
 
+转：https://blog.csdn.net/qq_38289815/article/details/82950320
 
+### 创建及注销线程相关操作：
 
+#### 1、**创建线程：**
 
+```c
+int pthread_create (pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
+功能：创建一个具有指定参数的线程
+形参：
+	thread是要创建的线程的线程ID指针
+	pthread_t类型的定义是typedef unsigned long int pthread_t;(打印时要使用%lu或%u方式)
+	attr：创建线程时的线程属性(设置NULL表示使用默认线程属性)
+	start_routine：指向的是新线程将运行的函数。线程一旦被创建好，内核就可以调度内核线程来执行start_routine函数指针所指向的函数了
+	arg：指向的是运行函数的形参
+返回值：若是成功建立线程返回0,否则返回错误的编号
+```
 
+#### 2、等待线程结束：
 
+```c
+int pthread_join(pthread_t thread, void **retval);
+功能：这个函数是一个线程阻塞的函数，调用它的函数将一直等待到被等待的线程结束为止，当函数返回时，被等待线程的资源被收回
+形参：
+	thread是被等待的线程标识符。
+	retval：一个用户定义的指针，它可以用来存储被等待线程的返回值。
+返回值：成功返回0,否则返回错误的编号。
+错误码：
+	①EDEADLK：可能引起死锁，比如两个线程互相针对对方调用pthread_join，或者线程对自身调用pthread_join。
+	②EINVAL：目标线程是不可回收的，或者已经有其他线程在回收目标线程。
+	③ESRCH：目标线程不存在。
+```
 
+#### 3、线程退出：
 
+```c
+void pthread_exit(void *retval);
+功能：线程函数在结束时调用此函数，以确保安全、干净地退出。
+形参：
+	retval是函数的返回指针，只要pthread_join中的第二个参数retval不是NULL，这个值将被传递给retval。	pthread_exit函数通过retval参数向线程的回收者传递其退出信息。他执行完之后不会返回到调用者，而且永远不会失败。
+```
 
+#### 4、线程取消：
 
+```c
+int pthread_cancel(pthread_t thread);
+功能：取消某个线程的执行。
+形参：thread是要取消线程的标识符ID。
+返回值：若是成功返回0,否则返回错误的编号。
+但是，接收到取消请求的目标线程可以决定是否允许被取消以及如何取消，这分别由如下两个函数完成。
+	int pthread_setcancelstate(int state, int *oldstate);
+	int pthread_setcanceltype(int type, int *oldtype);
+这两个函数的第一个参数分别用于设置线程的取消状态(是否允许取消)和取消类型(如何取消)，第二个参数则分别记录线程原来的取消状态和取消类型。
+state参数有两个可选值：
+	PTHREAD_CANCEL_CNABLE，允许线程被取消。它是线程被创建时的默认取消状态。
+	PTHREAD_CANCEL_DISABLE，禁止线程被取消。这种情况下，如果一个线程收到取消请求，则它会将请求挂起，直到该线程允许被取消。
+type参数也有两个可选值：
+	PTHREAD_CANCEL_ASYNCHRONOUS，线程随时都可以被取消。它将使得接收到取消请求的目标线程立即采取行动。
+	PTHREAD_CANCEL_DEFERRED，允许目标线程推迟行动，直到它调用了下面几个所谓的取消点函数中的一个：pthread_join、pthread_testcancel、pthread_cond_wait、pthread_cond_timedwait、sem_wait和sigwait。根据POSIX标准，其他可能阻塞的系统调用，比如read、wait，也可以成为取消点。不过为了安全起见，最好在可能会被取消的代码中调用pthread_testcancel函数设置取消点。
+```
 
+#### 5、获取当前线程ID：
+
+```c
+pthread_t pthread_self (void);
+功能：获取当前调用线程的线程ID。
+返回值：当前线程的线程ID标识。
+```
+
+#### 6、分离释放线程：
+
+```c
+int pthread_detach (pthread_t thread);
+功能：线程资源释放方式设置函数。
+形参：thread是要释放线程的标识符ID。
+返回值：若是成功返回0,否则返回错误的编号。
+其他说明：linux线程执行和windows不同，pthread有两种状态joinable状态和unjoinable状态。一个线程默认的状态是joinable，如果线程是joinable状态，当线程函数自己返回退出时或pthread_exit时，都不会释放线程所占用堆栈和线程描述符（总计8K多），只有当调用了pthread_join之后这些资源才会被释放。若是unjoinable状态的线程，这些资源在线程函数退出时或pthread_exit时自动会被释放。unjoinable属性可以在pthread_create时指定，或在线程创建后在线程中pthread_detach自己设置，如：						 	pthread_detach(pthread_self())，将状态改为unjoinable状态，确保资源的释放。如果线程状态为joinable，需要在之后适时调用pthread_join。
+```
+
+#### 7、比较两个线程是否为同一线程：
+
+```c
+int pthread_equal (pthread_t thread1, pthread_t thread2);
+功能：判断两个线程ID是否是同一个。
+形参：
+	thread1是要比较的线程的标识符ID1；
+	thread2是要比较的线程的标识符ID2。
+返回值：不相等返回0，相等非零。
+```
+
+#### 8、创建线程私有数据：
+
+```c
+int pthread_key_create (pthread_key_t *key, void (*destr_function) (void *));
+功能：创建线程私有数据TSD，提供线程私有的全局变量。使用同名而不同内存地址的线程私有数据结构。
+形参：
+	Key是线程私有数据。
+	第二个参数：如果第二个参数不为空，在线程退出时将以key所关联数据为参数调用其指向的资源释放函数，以释放分配的缓冲区。
+其他说明：不论哪个线程调用pthread_key_create()函数，所创建的key都是所有线程可访问的，但各个线程可根据自己的需要往key中填入不同的值 相当于提供了同名不同值的全局变量,各线程对自己私有数据操作互相不影响。
+```
+
+#### 9、注销线程私有数据：
+
+```c
+int pthread_key_delete (pthread_key_t *key);
+该函数并不检查当前是否有线程正是用该TSD，也不会调用清理函数(destr_function) 将TSD释放以供下一次调用pthread_key_create()使用。
+```
+
+#### 10、读写线程私有数据：
+
+```c
+int pthread_setspecific (pthread_key_t key, const void *pointer); //写
+void pthread_getspecific (pthread_key_t key); //读
+函数pthread_setspecific()将pointer的值(非内容)与key相关联。函数pthread_getspecific()将与key相关联的数据读出来。所有数据都设置为void *，因此可以指向任何类型的数据。
+```
+
+### 线程属性操作：
+
+#### 1、初始化线程对象属性：
+
+```c
+int pthread_attr_init (pthread_attr_t *attr);
+功能：pthread_attr_init实现时为属性对象分配了动态内存空间。
+形参：attr是指向一个线程属性的指针。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 2、销毁线程对象属性：
+
+```c
+int pthread_attr_destroy (pthread_attr_t *attr);
+功能：经pthread_attr_destroy去除初始化之后的pthread_attr_t结构被pthread_create函数调用，将会导致其返回错误。只有再次初始化后才能继续使用。
+形参：attr是指向一个线程属性的指针。
+```
+
+#### 3、获取线程分离状态属性：
+
+```c
+int pthread_attr_getdetachstate (pthread_attr_t *attr, int *detachstate);
+功能：获取线程分离状态属性；另外，pthread_detach()是分离释放线程资源函数
+形参：
+	attr是指向一个线程属性的指针。
+	detachstate：保存返回的分离状态属性。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 4、修改线程分离状态属性：
+
+```c
+int pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate);
+功能：修改线程分离状态属性。
+形参：attr是指向一个线程属性的指针。
+detachstate：其含义是线程的脱离状态，它有两个可选值，分别是PTHREAD_CREATE_JOINABLE（可连接）以及PTHREAD_CREATE_DETACHED(分离)。前者指定线程是可以被回收的，后者使调用线程脱离与进程中其他线程同步。脱离了与其他线程同步的线程成为”脱离线程”。脱离线程在退出时将自行释放其占用的系统资源。线程创建时该属性的默认值是PTHREAD_CREATE_JOINABL。此外，我们可以使用pthread_detach函数直接将线程设置为脱离线程。(上述detachstate的含义相同，之后相同含义的参数，都只介绍一次)
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 5、获取线程的CPU亲缘性：
+
+```c
+int pthread_attr_getaffinity_np (pthread_attr_t *attr, size_t cpusetsize, cpu_set_t *cpuset);
+功能：获取线程的CPU亲缘属性。
+形参：attr是指向一个线程属性的指针。
+cpusetsize：指向CPU组的缓冲区大小。
+cpuset：指向CPU组的指针。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 6、设置线程CPU亲缘性：
+
+```c
+int pthread_attr_setaffinity_np (pthread_attr_t *attr, size_t cpusetsize, const cpu_set_t *cpuset);
+功能：通过指定cupset来设置线程的CPU亲缘性。
+形参：attr是指向一个线程属性的指针。
+cpusetsize：指向CPU组的缓冲区大小。
+cpuset：指向CPU组的指针。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 7、获取线程的作用域：
+
+```c
+int pthread_attr_getscope (const pthread_attr_t *attr, int *scope);
+功能：指定了作用域也就指定了线程与谁竞争资源。
+形参：attr是指向一个线程属性的指针；scope是返回线程的作用域。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 8、设置线程的作用域：
+
+```c
+int pthread_attr_setscope (pthread_attr_t *attr, int scope);
+功能：指定了作用域也就指定了线程与谁竞争资源
+形参：attr是指向一个线程属性的指针。
+scope：线程间竞争CPU的范围，即线程优先级的有效范围。POSIX标准定义了该属性可以取以下两个值：PTHREAD_SCOPE_SYSTEM和PTHREAD_SCOPE_PROCESS，前者表示目标线程与系统中所有线程一起竞争CPU的使用，后者表示目标线程仅与其他隶属于同一进程的线程竞争CPU的使用。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 9、获取线程的栈保护区大小：
+
+```c
+int pthread_attr_getguardsize (const pthread_attr_t *attr, size_t *guardsize);
+功能：获取线程的栈保护区大小。
+形参：
+	attr是指向一个线程属性的指针。
+	guardsize：返回获取的栈保护区大小。
+返回值：若是成功返回0,否则返回错误的编号
+```
+
+#### 10、设置线程的栈保护区大小：
+
+```c
+int pthread_attr_setguardsize (pthread_attr_t *attr, size_t *guardsize);
+功能：参数提供了对栈指针溢出的保护。默认为系统页大小。
+形参：attr是指向一个线程属性的指针。
+guardsize：线程的栈保护区大小。如果guardsize大于0，则系统创建线程的时候会在其堆栈的尾部额外分配guardsize字节的空间，作为保护堆栈不被错误地覆盖的区域。如果guardsize等于0，则系统不为新创建的线程设置堆栈保护区。如果使用者通过pthread_attr_setstack()或pthread_attr_setstackaddr()函数手动设置线程的堆栈，则guardsize属性将被忽略。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+11、获取栈的堆栈信息（栈地址和栈大小）：
+
+```c
+int pthread_attr_getstack (const pthread_attr_t *attr, void **stackaddr, size_t *stacksize);
+功能：获取线程的堆栈地址和大小。
+形参：
+	attr是指向一个线程属性的指针。	
+	stackaddr：返回获取的栈地址。
+	stacksize：返回获取的栈大小。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 12、设置线程的堆栈区：
+
+```c
+int pthread_attr_setstack (pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+功能：设置堆栈区，将导致pthread_attr_setguardsize失效。
+形参：
+	attr是指向一个线程属性的指针。
+	stackaddr：线程的堆栈地址，应该是可移植的，对齐页边距的，可以用posix_memalign来进行获取。
+	stacksize：线程的堆栈大小，应该是页大小的整数倍。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 13、获取线程堆栈地址：
+
+```c
+int pthread_attr_getstackaddr (const pthread_attr_t *attr, void **stackaddr);
+功能：一般用pthread_attr_getstack来代替。
+形参：attr是指向一个线程属性的指针；stackaddr是返回获取的栈地址。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 14、设置线程堆栈地址：
+
+```c
+int pthread_attr_setstackaddr (pthread_attr_t *attr, void *stackaddr);
+功能：一般用pthread_attr_setstack来代替。
+形参：
+	attr是指向一个线程属性的指针；stackaddr是设置线程堆栈地址。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 15、获取线程堆栈大小：
+
+```c
+int pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *stacksize);
+功能：获取线程堆栈大小。
+形参：attr是指向一个线程属性的指针；stacksize是返回线程的堆栈大小。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 16、设置线程堆栈大小：
+
+```c
+int pthread_attr_setstacksize (pthread_attr_t *attr, size_t stacksize);
+功能：设置线程堆栈大小。
+形参：
+	attr是指向一个线程属性的指针。
+	stacksize：设置线程的堆栈大小,stack属性的合法值包括PTHREAD_STACK_MIN，该线程的用户栈大小将使用默认堆栈大小，为某个线程所需最小堆栈大小，但对于所有线程，这个大小可能无法接受，具体指定的大小，即使用线程的用户堆栈大小的数值，必须不小于最小堆栈大小PTHREAD_STACK_MIN。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 17、获取线程的调度策略：
+
+```c
+int pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy);
+功能：获取线程的调度策略。
+形参：
+	attr是指向一个线程属性的指针；
+	policy是返回线程的调度策略。
+返回值：若是成功返回0,否则返回错误的编号。
+按照如下方法使用sched_get_priority_max()和sched_get_priority_min()，可以得到优先级的最大值和最小值。 
+头文件：#include <pthread.h> #include <sched.h>
+调用形式：
+	#include <sched.h>
+	int sched_get_priority_max(int policy);
+	int sched_get_priority_min(int policy);
+```
+
+#### 18、设置线程调度策略：
+
+```c
+int pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy);
+头文件：
+	#include <pthread.h> 
+	#include <sched.h>
+功能：设置线程的调度策略。
+形参：
+	attr是指向一个线程属性的指针。
+	policy：线程的调度策略，POSIX指定了3种调度策略属性：SCHED_FIFO表示先入先出策略，SCHED_RR表示轮转调度(这两种调度方法都具备实时调度功能，但只能用于以超级用户身份运行的进程)，SCHED_OTHER是系统默认策略，SCHED_OTHER是不支持优先级使用的。SCHED_FIFO和SCHED_RR支持优先级的使用，它们分别为1和99，数值越大优先级越高。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 19、获取线程的调度参数：
+
+```c
+int pthread_attr_getschedparam (const pthread_attr_t *attr, struct sched_param *param);
+头文件：#include <pthread.h> #include <sched.h>
+功能：获取线程的调度参数。
+形参：
+	attr是指向一个线程属性的指针；
+	param是返回获取的调度参数。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 20、设置线程的调度参数：
+
+```c
+int pthread_attr_setschedparam (pthread_attr_t *attr, const struct sched_param *param);
+头文件：
+	#include <pthread.h> 
+	#include <sched.h>
+功能：设置线程的调度参数，用于设置优先级。
+形参：
+	attr是指向一个线程属性的指针。
+	param：要设置的调度参数，其类型是sched_param结构体。至少需要定义这个数据成员
+struct sched_param
+{ 
+    int sched_priority; 
+    /*该成员表示线程运行优先级*/
+};
+sched_param可能还有其他的数据成员，以及多个用来返回和设置最小优先级、最大优先级、调度器、参数等的函数。如果调度策略是SCHED_FIFO或SCHED_RR，那么要求具有值的唯一成员是sched_priority。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 21、获取线程是否继承调度属性：
+
+```c
+int pthread_attr_getinheritsched (const pthread_attr_t *attr, int *inheritsched);
+头文件：#include <pthread.h> #include <sched.h>
+功能：获取线程是否继承调度属性。
+形参：attr是指向一个线程属性的指针；inheritsched是返回继承调度属性的设置。
+返回值：若是成功返回0,否则返回错误的编号。
+```
+
+#### 22、设置线程继承调度属性：
+
+```c
+int pthread_attr_setinheritsched (pthread_attr_t *attr, int inheritsched);
+头文件：#include <pthread.h> #include <sched.h>
+功能：设置线程是否继承调度属性。
+形参：
+	attr是指向一个线程属性的指针。
+	Inheritsched：设置线程是否继承调用线程的调度属性，可能取值如下：
+	PTHREAD_INHERIT_SCHED表示新线程沿用其创建者的线程调度参数，这种情况下再设置新线程的调度参数属性将没有任何效果。PTHREAD_EXPLICIT_SCHED表示调用者要明确地指定新线程的调度参数。
+返回值：若是成功返回0,否则返回错误的编号。
+```
 
 
 
