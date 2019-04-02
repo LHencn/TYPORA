@@ -6,16 +6,47 @@
 
 源：应用市场
 
-1. `sudo apt-get update` 更新`/etc/apt/sources.list`软件列表
-2. `sudo apt-get upgrade` 更新软件
-3. `sudo !!` 刚才执行的命令没有管理员权限，该命令为加上管理员权限
-4. `apt-cache search` 
-5. `apt-get intall` 安装软件包
-6. `pip` 
-7. `dpkg` 
-8. `nmon` 
+1. `sudo !!` 刚才执行的命令没有管理员权限，该命令为加上管理员权限
+
+2. 安装软件的方式
+
+   1. `sudo apt-get update` 更新`/etc/apt/sources.list`软件列表（更新源）
+   2. `sudo apt-get upgrade` 更新本地软件
+   3. `apt-cache search` ：在本系统源中寻找软件版本 
+   4. `apt-cache search mysql`
+   5. `apt-get intall vim` 安装软件包
+   6. `pip` ：Python包管理工具
+   7. `rmp` ：
+   8. `dpkg-i 软件包` ：下载软件包并且当出错时输出错误信息
+
+3. `nmon` ：帮助在屏幕上实时动态更新显示CPU系统性能等重要信息；
+
+4. `alias` ：别名绑定，在`.bashrc`文件中，编辑完后采用`source`（当前环境下读取并执行该文件命令）执行该脚本
+
+5. `mkdir` ：创建目录
+
+6. `touch`：修改文件的时间戳，也可以创建空白文件
+
+7. `echo`：输出
+
+   1. ```shell
+      echo a > a 
+      #流输入重定向
+      ```
+
+8. `cat`：强制读（输出）
+
+9. `cp` ：
+
+   1. `cp a b` ：将用目录a的内容覆盖b
 
 常用命令
+
+linux中有7种文件类型，目录也是一种文件，
+
+`sources.list.d`：存放源的目录，一个完整的Ubuntu源大概有2T左右，选源的时候必须要指定系统版本。
+
+
 
 ### 操作系统概念：（2/5）
 
@@ -23,7 +54,7 @@
 
 1. 计算器：CPU
 2. 控制器：CPU
-3. ## 存储器：内部存储（内存） 寻址空间（MP3） 国家：每个国家做成一个单元，国家中的各个市为每个区
+3. **存储器**：内部存储（内存） 寻址空间（MP3） 国家：每个国家做成一个单元，国家中的各个市为每个区
 4. 输入设备：鼠标、键盘
 5. 输出设备：显示器、音频等
 
@@ -381,6 +412,14 @@ office：word、ppt、表格等均需采用打印功能，此时可以采用系�
    2. ？root、普通用户登录shell如何区分？
 
 Linux的基本命令：
+
+`sudo apt-get update` : 更新源
+
+`sudo apt-get upgrade` ：更新本地软件（源端比本地更新）
+
+`sudo !!` ：执行上次的操作加上管理员权限
+
+
 
 # 一.文件管理
 
