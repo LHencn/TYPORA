@@ -347,13 +347,44 @@ strncpy是 [C语言](https://baike.baidu.com/item/C%E8%AF%AD%E8%A8%80)的库函
 函数原型char *strncpy(char *dest,char *src,int size_t);
 ```
 
+##### 一些常用的字符串函数
+
+```c
+ 
+void *memset(void *s,int c,size_t n);
+ 
+size_t strlen(const char *s);
+ 
+void *memcpy(void *dest,const void *src,size_t n);
+void *memmove(void *dest,const void *src,size_t n);
+ 
+char *strcat(char *dest,const char *src);
+char *strncat(char *desk,const char *src,size_t n);
+ 
+//大小写敏感
+int memcmp(const void *s1,const void *s2,size_t n);
+int strcmp(const char *s1,const char *s2);
+int strncmp(const char *s1,const char *s2,size_t n);
+ 
+//大小写不敏感
+int strcasecmp(const char *s1,const char *s2);
+int strncasecmp(const char *s1,const char *s2,size_t n);
+ 
+//正反向查询
+char *strchr(const char *s,int c);
+char *strrchr(const char *s,int c);
+char *strstr(const char *haystack,const char *needle);
+ 
+//分割字符串
+char *strtok(char *str,const char *delim);
+char *strtok_r(char *str,const char *delim,char **saveptr);
+```
+
 
 
 ## STL
 
 #### #include《string》
-
-
 
 #### **popen**函数：
 
